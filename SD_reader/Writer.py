@@ -1,12 +1,20 @@
 from machine import Pin, SPI 
-import uos
+import vfs
 from MicroSD import SDCard as sdcard
-from typing import Optional,Protocol, Any, List, Dict
+from typing import Optional,Protocol, Any, List, Dict, Callable, Literal
+import micropython
 
+
+
+#Esta clase es la base de las funciones que se van a utilizar#
 class Writer(Protocol):
-    def check_format(self) -> None:
+    def check_format(self) -> bool:
         ...
     def close(self) -> None:
+        ...
+
+    #Esta funcion va a ayudar a cargar los datos de la memoria para evitar repetir el abrirla para subir los datos#
+    def check_errors(self,message:Literal["Error al cargar la memoria sd"]) -> Callable[[Callable[...,Any]],Callable[...,Any]]:
         ...
 
 class SD_writer(Writer):
@@ -37,4 +45,34 @@ class SD_writer(Writer):
         self.spi:object|SPI = SPI(self.spi_pin, baudrate=1000000, polarity=0, phase=0, sck=self.sck_pin, mosi=self.mosi_pin, miso=self.miso_pin)
 
         #-- Setting up the sdcard connection#
-        self.sd:object|sdcard = sdcard(self.spi, self.cs_pin) #Los pines estan definidos por default#
+        self.sd:object|sdcard = sdcard(self.spi, self.cs_pin) #-- Los pines estan definidos por default --#
+
+    def check_errors(self, message:Literal["Error al cargar la memoria sd"]) -> Callable[[Callable[...,Any]],Callable[...,Any]]:
+        def decorator_func(func:Callable[...,Any]) -> Callable[...,Any]:
+            def wrapper(self,*args, **kwargs):
+                try:
+                    #Aqui agregar el try de la memoria sd, para hacer rolbacks#
+
+                    return func(self,*args, **kwargs)
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+                    raise
+            return wrapper
+        return decorator_func
+
+
+    
+    def check_format(self) -> bool:
+        """
+        Checks if the SD card is properly formatted and accessible.
+
+        Atributes 
+        ---------
+        `self`:object: Instance of the SD_writer class.
+        """
+        #Revisar esto con calma#
+        VfsFat = vfs.
+        vfs32 = vfs.VfsFat(self.sd)
+
+        return True
+import os
