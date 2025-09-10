@@ -1,3 +1,2 @@
-/blink.py
-.venv/
-/prueba.py
+build
+!.vscode/*
