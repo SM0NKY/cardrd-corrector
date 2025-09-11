@@ -37,7 +37,11 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(rp2040 rp2040.cpp )
+add_executable(rp2040 rp2040.cpp)
+add_executable(app 
+    src/create_data.cpp
+    src/read_data.cpp
+)
 
 pico_set_program_name(rp2040 "rp2040")
 pico_set_program_version(rp2040 "0.1")
