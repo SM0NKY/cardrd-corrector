@@ -11,7 +11,13 @@
 #define PIN_SCK  18
 #define PIN_MOSI 19
 
-
+class RP2040 {
+public:
+    RP2040() {
+        stdio_init_all();
+        printf("RP2040 Initialized\n");
+    }
+};
 
 int main()
 {
